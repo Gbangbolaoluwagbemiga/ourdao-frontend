@@ -471,3 +471,63 @@ export function useMembers(limit = 50) {
     refetch,
   }
 }
+
+// ---------------------------------------------------------------------------
+// #643 — useDaoSummary: single summary read for landing stats
+// ---------------------------------------------------------------------------
+
+export function useDaoSummary() {
+  const enabled = isContractConfigured()
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.daoSummary(),
+    enabled,
+    queryFn: () => daoRead.getDaoSummary(),
+    staleTime: 30_000,
+    refetchIntervalInBackground: false,
+  })
+  return { summary: data ?? null, isLoading, isError }
+}
+
+// ---------------------------------------------------------------------------
+// #644 — useMemberOverview: single overview read for the member profile page
+// ---------------------------------------------------------------------------
+
+export function useMemberOverview(address?: string | null) {
+  const enabled = isContractConfigured() && !!address
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.memberOverview(address ?? ''),
+    enabled,
+    queryFn: () => daoRead.getMemberOverview(address!),
+    staleTime: 30_000,
+    refetchIntervalInBackground: false,
+  })
+  return { overview: data ?? null, isLoading, isError }
+}
+
+// ---------------------------------------------------------------------------
+// #549 — useDelegate / useVotingWeight
+// ---------------------------------------------------------------------------
+
+export function useDelegate(address?: string | null) {
+  const enabled = isContractConfigured() && !!address
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: queryKeys.delegate(address ?? ''),
+    enabled,
+    queryFn: () => daoRead.getDelegate(address!),
+    staleTime: 30_000,
+    refetchIntervalInBackground: false,
+  })
+  return { delegate: data ?? null, isLoading, isError, refetch }
+}
+
+export function useVotingWeight(address?: string | null) {
+  const enabled = isContractConfigured() && !!address
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.votingWeight(address ?? ''),
+    enabled,
+    queryFn: () => daoRead.getVotingWeight(address!),
+    staleTime: 30_000,
+    refetchIntervalInBackground: false,
+  })
+  return { votingWeight: data ?? null, isLoading, isError }
+}
